@@ -1,0 +1,69 @@
+/**
+ * This file is part of the Alfred package.
+ *
+ * (c) Mickael Gaillard <mick.gaillard@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+package org.rosbuilding.light.internal;
+
+import java.io.IOException;
+
+import org.rosbuilding.common.ISystem;
+import org.rosbuilding.light.LightNode;
+import org.rosbuilding.light.driver.LightDriver;
+
+import smarthome_light_msgs.msg.LightAction;
+import smarthome_light_msgs.msg.StateData;
+
+/**
+*
+* @author Erwan Le Huitouze <erwan.lehuitouze@gmail.com>
+*
+*/
+public class LightSystem implements ISystem<StateData, LightAction> {
+
+    public static final String OP_LIGHT = "light";
+
+    private static final String MEDTHOD_LIGHT = "light";
+    private static final String PROTO_LIGHT = MEDTHOD_LIGHT + "://";
+    private static final String RGB    = "rgb";
+    private static final String HSB    = "hsb";
+
+    private LightDriver driver;
+
+    /**
+     * Light node.
+     */
+    private LightNode node;
+
+    public LightSystem(LightNode node) {
+        this.node = node;
+        this.driver = node.getDriver();
+    }
+
+    @Override
+    public void load(StateData stateData) {
+        // TODO Auto-generated method stub
+    }
+
+    @Override
+    public void callbackCmdAction(LightAction message, StateData stateData) throws IOException, InterruptedException {
+        this.node.logD("Receive message");
+
+//        if (message.getState() == ON) {
+//            this.driver.powerOn();
+//        } else if (message.getState() == OFF) {
+//            this.driver.powerOff();
+//        } else {
+        this.node.logD("Call light driver to change HSB color");
+
+        this.driver.setHSV(
+                message.getHsb().getHue(),
+                message.getHsb().getSaturation(),
+                message.getHsb().getBrightness());
+//        }
+    }
+
+}

@@ -1,0 +1,34 @@
+plugins {
+    id "org.ros2.rcljava" version "0.4.7"
+}
+
+apply plugin: 'org.ros2.rcljava'
+
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
+
+group = 'org.rosbuilding'
+
+repositories {
+     jcenter()
+}
+
+dependencies {
+    compile 'joda-time:joda-time:2.3'
+    compile 'com.google.guava:guava:12.0'
+
+    testCompile 'junit:junit:4.12'
+
+    runtime fileTree(dir: 'libs', include: '*.jar')
+}
+
+ament {
+    generateEclipse = true
+
+    scripts {
+        main {
+            applicationName = project.name
+            mainClassName = 'org.rosbuilding.light.LightNode'
+        }
+    }
+}
