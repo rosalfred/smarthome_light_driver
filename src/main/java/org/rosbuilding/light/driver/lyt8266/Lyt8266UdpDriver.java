@@ -27,18 +27,22 @@ public class Lyt8266UdpDriver implements LightDriver {
         }
     }
 
+    @Override
     public void powerOn() {
         this.setBrightness(255);
     }
 
+    @Override
     public void powerOff() {
         this.setBrightness(0);
     }
 
+    @Override
     public void setBrightness(int brightness) {
         this.sendData(String.format("+4,%d,\r\n", brightness));
     }
 
+    @Override
     public void setRGB(int red, int green, int blue) {
         this.sendData(String.format("+1,%d,%d,%d,\r\n", red, green, blue));
     }
@@ -53,6 +57,7 @@ public class Lyt8266UdpDriver implements LightDriver {
      *
      * @return the resulting RGB color
      */
+    @Override
     public void setHSV(float hue, float saturation, float brightness) {
         float r, g, b;
 
@@ -121,6 +126,7 @@ public class Lyt8266UdpDriver implements LightDriver {
      *
      * @return the resulting RGB color
      */
+    @Override
     public void setHSL(int h, int s, int l) {
         int r = 0, g = 0, b = 0;
 

@@ -17,6 +17,8 @@ import org.rosbuilding.common.light.LightStateDataComparator;
 import org.rosbuilding.light.driver.LightDriver;
 import org.rosbuilding.light.driver.lyt8266.Lyt8266UdpDriver;
 import org.rosbuilding.light.internal.LightSystem;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import smarthome_light_msgs.msg.LightAction;
 import smarthome_light_msgs.msg.StateData;
@@ -25,9 +27,12 @@ import smarthome_light_msgs.msg.StateData;
  * Light ROS Node.
  *
  * @author Erwan Le Huitouze <erwan.lehuitouze@gmail.com>
+ * @author Mickael Gaillard <mick.gaillard@gmail.com>
  *
  */
 public class LightNode extends BaseDriverNode<LightConfig, StateData, LightAction> {
+
+    private static final Logger logger = LoggerFactory.getLogger(LightNode.class);
 
     private LightDriver driver;
 
@@ -37,45 +42,42 @@ public class LightNode extends BaseDriverNode<LightConfig, StateData, LightActio
             new LightMessageConverter(),
             LightAction.class.getName(),
             StateData.class.getName());
+
+        LightNode.logger.debug("Light Node Initialized.");
     }
 
     @Override
     public void onStart(Node connectedNode) {
+        LightNode.logger.debug("onStart event !");
         super.onStart(connectedNode);
+
         this.driver = new Lyt8266UdpDriver(this);
-        this.startFinal();
     }
 
-    @Override
-    public void onShutdown(Node node) {
-        super.onShutdown(node);
-    }
+//    @Override
+//    public void onShutdown() {
+//        LightNode.logger.debug("onShutdown event !");
+//        super.onShutdown();
+//    }
 
     @Override
     protected void onConnected() {
-        //this.getStateData().setState(StateData.ENABLE);
+        LightNode.logger.debug("onConnected event !");
+//        this.getStateData().setState(StateData.ENABLE);
     }
 
     @Override
     protected void onDisconnected() {
-        //this.getStateData().setState(StateData.UNKNOWN);
+        LightNode.logger.debug("onDisconnected event !");
+//        this.getStateData().setState(StateData.UNKNOWN);
     }
-
-//    @Override
-//    public void onNewMessage(MediaAction message) {
-//        if (message != null) {
-//            this.logI(String.format("Command \"%s\"... for %s",
-//                    message.getMethod(),
-//                    message.getUri()));
-//
-//            super.onNewMessage(message);
-//        }
-//    }
 
     @Override
     protected boolean connect() {
         boolean isConnected = false;
+
         this.logI(String.format("Connecting to %s:%s...", this.configuration.getHost(), this.configuration.getPort()));
+        LightNode.logger.debug(String.format("Connecting to %s:%s...", this.configuration.getHost(), this.configuration.getPort()));
 
         try {
             //this.getStateData().setState(StateData.INIT);
@@ -95,6 +97,7 @@ public class LightNode extends BaseDriverNode<LightConfig, StateData, LightActio
 
     @Override
     protected void initialize() {
+        LightNode.logger.debug("Custom Managed Node.");
         super.initialize();
 
         this.addModule(new LightSystem(this));
@@ -102,6 +105,7 @@ public class LightNode extends BaseDriverNode<LightConfig, StateData, LightActio
 
     @Override
     protected LightConfig makeConfiguration() {
+        LightNode.logger.debug("Make Configuration.");
         return new LightConfig(this.getConnectedNode());
     }
 
@@ -110,19 +114,19 @@ public class LightNode extends BaseDriverNode<LightConfig, StateData, LightActio
     }
 
     public static void main(String[] args) throws InterruptedException {
-        // Initialize RCL
-        RCLJava.rclJavaInit();
+        RCLJava.rclJavaInit(args);
 
-        // Let's create a Node
-        Node node = RCLJava.createNode("/home/salon", "light");
+        final LightNode light = new LightNode();	//TODO lazy instance.
+        final Node node = RCLJava.createNode("light");
 
-        LightNode light = new LightNode();
         light.onStart(node);
+        light.onStarted();
 
         RCLJava.spin(node);
 
-        light.onShutdown(node);
-        node.dispose();
+        light.onShutdown();
+        light.onShutdowned();
+
         RCLJava.shutdown();
     }
 }
