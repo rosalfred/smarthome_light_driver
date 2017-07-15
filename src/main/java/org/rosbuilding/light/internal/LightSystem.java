@@ -9,8 +9,9 @@
 package org.rosbuilding.light.internal;
 
 import java.io.IOException;
+import java.util.List;
 
-import org.rosbuilding.common.ISystem;
+import org.rosbuilding.common.System;
 import org.rosbuilding.light.LightNode;
 import org.rosbuilding.light.driver.LightDriver;
 
@@ -22,12 +23,12 @@ import smarthome_light_msgs.msg.StateData;
 * @author Erwan Le Huitouze <erwan.lehuitouze@gmail.com>
 *
 */
-public class LightSystem implements ISystem<StateData, LightAction> {
+public class LightSystem extends System<StateData, LightAction> {
 
     public static final String OP_LIGHT = "light";
 
-    private static final String MEDTHOD_LIGHT = "light";
-    private static final String PROTO_LIGHT = MEDTHOD_LIGHT + "://";
+    private static final String METHOD_LIGHT = "light";
+    private static final String PROTO_LIGHT = METHOD_LIGHT + "://";
     private static final String RGB    = "rgb";
     private static final String HSB    = "hsb";
 
@@ -41,6 +42,11 @@ public class LightSystem implements ISystem<StateData, LightAction> {
     public LightSystem(LightNode node) {
         this.node = node;
         this.driver = node.getDriver();
+    }
+
+    @Override
+    protected void initializeAvailableMethods(List<String> availableMethods) {
+        availableMethods.add(OP_LIGHT);
     }
 
     @Override
